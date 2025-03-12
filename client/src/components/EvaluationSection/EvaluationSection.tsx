@@ -1,3 +1,5 @@
+import remarkGfm from "remark-gfm"
+import Markdown from 'react-markdown'
 import './EvaluationSection.css'
 
 function EvaluationSection({ text }: { text: string }) {
@@ -6,7 +8,7 @@ function EvaluationSection({ text }: { text: string }) {
     <div className='eval-section'>
 			<div className='eval-result'>
 				<h2>תוצאה</h2>
-				<p>{text}</p>
+        <Markdown remarkPlugins={[remarkGfm]}>{text}</Markdown>
 			</div>
     </div>
   )

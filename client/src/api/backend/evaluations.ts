@@ -10,7 +10,7 @@ export const evaluate = async (decisionNumber: number, decisionText: string): Pr
   }));
 
   if (error) {
-    return [error] // TODO: handle error
+    return [error]
   }
 
   const evaluationText = await response.text();

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DotLoader from 'react-spinners/DotLoader'
 import { Input, Textarea } from '@mui/joy'
 
 import { evaluate } from '../../api/backend/evaluations'
@@ -11,6 +12,7 @@ function MainPage() {
   const [decisionText, setDecisionText] = useState<string>('')
   const [analyzationResult, setEvaluationResult] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleDecisionNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDecisionNumber(parseInt(event.target.value))
@@ -20,7 +22,7 @@ function MainPage() {
   }
 
   const sendToEvaluation = async () => {
-    console.log('Evaluating...')
+    setIsLoading(true)
 
     const [err2, responseText] = await evaluate(decisionNumber, decisionText)
     
@@ -29,12 +31,20 @@ function MainPage() {
     } else {
       setEvaluationResult(responseText)
     }
+    setIsLoading(false)
   }
 
   return (
     <div className='main-page'>
-      <h1>גוביינה - מנתח ההחלטות הממשלתיות</h1>
-      <h2>מבית המרכז להעצמת האזרח</h2>
+      <div className='logo-section'>
+        <img src="/CECI-wide-logo.png" alt="CECI logo" />
+      </div>
+      <div className='tutorial'>
+        {`היי, אני עוזר ה-AI של המרכז להעצמת האזרח, לבחינת עבודת הממשלה. אז מה אני יודע לעשות? כרגע להעריך את מידת הישימות של החלטות ממשלה. רוצה לנסות?\n
+על מנת להתחיל תבחרו `}
+        <a target='_blank' href='https://www.gov.il/he/departments/dynamiccollectors/gov_decision'>החלטת ממשלה</a>
+        {` והדביקו כאן מספר החלטת ממשלה ואת נוסח ההחלטה`}
+      </div>
       <div className="inputs-form">
         <label>מספר ההחלטה</label>
         <Input className='decision-number-input' type='number' onChange={handleDecisionNumberChange} />
@@ -46,10 +56,14 @@ function MainPage() {
           placeholder="הדביקו כאן את תוכן ההחלטה"
           minRows={4}
         />
-        <button className='analyze-button' onClick={sendToEvaluation}>Analyze</button>
+        <button className='evaluate-button' onClick={sendToEvaluation}>Evaluate</button>
       </div>
-      {analyzationResult && <EvaluationSection text={analyzationResult} />}
-      {error && <p>{error}</p>}
+      {isLoading && <div className='loader-container'><DotLoader className='loader' /></div>}
+      {(!isLoading && analyzationResult) && <EvaluationSection text={analyzationResult} />}
+      {(!isLoading && error) && <>
+        <p>משהו לא הצליח. אם יש צורך, צור קשר עם התמיכה ושלח את השגיאה שקיבלת.</p>
+        <code className='error-message'>{error}</code>
+      </>}
     </div>
   )
 }

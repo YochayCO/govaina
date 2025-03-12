@@ -5,8 +5,8 @@
   direction: rtl;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -30,10 +30,6 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
 
 button {
   border-radius: 8px;
@@ -65,4 +61,8 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+pre {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
