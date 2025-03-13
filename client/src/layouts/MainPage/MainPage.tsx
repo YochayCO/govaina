@@ -23,6 +23,7 @@ function MainPage() {
 
   const sendToEvaluation = async () => {
     setIsLoading(true)
+    setError('')
 
     const [err2, responseText] = await evaluate(decisionNumber, decisionText)
     
