@@ -4,12 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "build-client": "npm build --prefix client",
         "build-server": "npm build --prefix server",
         "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
     },
     "dependencies": {
         "concurrently": "^8.0.2"
-    },
-    "devDependencies": {
     }
 }

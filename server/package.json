@@ -1,28 +1,31 @@
 {
   "name": "govaina-server",
-  "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "commonjs",
   "scripts": {
+    "dev": "nodemon",
     "build": "tsc",
-    "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts"
+    "build:watch": "tsc --watch",
+    "start": "node dist/main.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "cors": "^2.8.5",
+    "@supabase/supabase-js": "^2.49.4",
+    "compression": "^1.8.0",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.9",
+    "express": "^5.1.0",
+    "http-errors": "^2.0.0",
     "openai": "^4.86.2",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "sirv": "^3.0.1"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
+    "@eslint/js": "^9.21.0",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.13.9"
+    "@types/node": "^22.13.10",
+    "eslint": "^9.21.0",
+    "globals": "^15.15.0",
+    "tsx": "^4.19.3",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.24.1"
   }
 }
