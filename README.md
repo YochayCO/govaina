@@ -3,17 +3,22 @@ Analyze government decisions in a click
 
 ## How to build & deploy
 
-### build
-```
+### develop
+```bash
 git clone git@github.com:YochayCO/govaina.git
-cd govaina/client
+cd govaina/server
 npm install
-/* set environment variables */ 
-npm build
-```
+/* set environment variables in .env.local */ 
+npm run dev
 
-### dev
-`npm run dev`
+cd ../client
+npm install
+/* set environment variables in .env.local */ 
+npm run dev
+```
 
 ### deploy
-`pm2 --env production --name govaina start server.js`
+```bash
+/* set environment variables in server/.env.production */ 
+docker-compose up -d
+```
