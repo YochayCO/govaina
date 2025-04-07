@@ -3,11 +3,26 @@ import DotLoader from 'react-spinners/DotLoader'
 import { Input, Textarea } from '@mui/joy'
 
 import { evaluate } from '../../api/backend/evaluations'
+import ActionsSet from '../../components/ActionButton/ActionsSet'
 import EvaluationSection from '../../components/EvaluationSection/EvaluationSection'
+import { UserAction } from '../../types/users'
 
 import './MainPage.css'
 
+const TUTORIAL_TEXT_1 = `היי, אני עוזר ה-AI של המרכז להעצמת האזרח, לבחינת עבודת הממשלה. אז מה אני יודע לעשות? כרגע להעריך את מידת הישימות של החלטות ממשלה. רוצה לנסות?\n
+על מנת להתחיל תבחרו `
+
+const TUTORIAL_TEXT_2 = ` והדביקו כאן מספר החלטת ממשלה ואת נוסח ההחלטה`
+
+const tutorialElement = (
+  <div className='tutorial'>
+    {TUTORIAL_TEXT_1}
+    <a target='_blank' href='https://www.gov.il/he/departments/dynamiccollectors/gov_decision'>החלטת ממשלה</a>
+    {TUTORIAL_TEXT_2}
+  </div>
+)
 function MainPage() {
+  const [selectedAction, selectAction] = useState<UserAction>('decisionNumber')
   const [decisionNumber, setDecisionNumber] = useState<number>(0)
   const [decisionText, setDecisionText] = useState<string>('')
   const [analyzationResult, setEvaluationResult] = useState<string>('')
@@ -40,12 +55,12 @@ function MainPage() {
       <div className='logo-section'>
         <img src="/CECI-wide-logo.png" alt="CECI logo" />
       </div>
-      <div className='tutorial'>
-        {`היי, אני עוזר ה-AI של המרכז להעצמת האזרח, לבחינת עבודת הממשלה. אז מה אני יודע לעשות? כרגע להעריך את מידת הישימות של החלטות ממשלה. רוצה לנסות?\n
-על מנת להתחיל תבחרו `}
-        <a target='_blank' href='https://www.gov.il/he/departments/dynamiccollectors/gov_decision'>החלטת ממשלה</a>
-        {` והדביקו כאן מספר החלטת ממשלה ואת נוסח ההחלטה`}
-      </div>
+      {tutorialElement}
+      <ActionsSet 
+        actions={['decisionNumber', 'showExampleByLink', 'chatAboutDecision', 'showExample', 'showExampleByInterest']}
+        selectedAction={selectedAction} 
+        selectAction={selectAction} 
+      />
       <div className="inputs-form">
         <label>מספר ההחלטה</label>
         <Input className='decision-number-input' type='number' onChange={handleDecisionNumberChange} />
