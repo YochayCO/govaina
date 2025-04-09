@@ -5,8 +5,8 @@ import './ActionsSet.css'
 
 export type ActionsSetProps = { 
     actions: UserAction[]; 
-    selectedAction: UserAction;
-    selectAction: (action: UserAction) => void;
+    selectedAction: UserAction | null;
+    selectAction: (action: UserAction | null) => void;
 }
 
 const ACTION_LABELS_DICT: Record<UserAction, string> = {

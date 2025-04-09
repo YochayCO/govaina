@@ -1,31 +1,19 @@
-import { OpenAI } from 'openai';
-import { catchError } from './common';
+import { streamText, StreamTextResult, ToolSet } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    organization: "org-fgvdbOMEi46sit0opJ6AlWJi",
-});
-
-// Create a thread and run it
-export async function performCompletion(
+// Create a stream and run it
+export function performCompletion(
     userMessageText: string, systemInstructions: string
-): Promise<[Error] | [undefined, string]> {
-    const [error, completionObj] = await catchError(openai.chat.completions.create({
-        model: "gpt-4o-mini-2024-07-18",
+): StreamTextResult<ToolSet, never> {
+    const result = streamText({
+        model: openai("gpt-4o-mini-2024-07-18"),
         temperature: 1,
-        top_p: 1,
+        topP: 1,
+        system: systemInstructions,
         messages: [
-            { role: 'system', content: systemInstructions }, 
             { role: "user", content: userMessageText }
         ],
-    }));
-    
-    if (error) {
-        return [error];
-    }
+    });
 
-    const evaluation = completionObj.choices[0].message.content
-    if (!evaluation) return [new Error('Empty evaluation')]
-    
-    return [undefined, evaluation]
+    return result
 }

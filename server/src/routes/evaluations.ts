@@ -1,25 +1,70 @@
+import { Message } from 'ai';
 import { Router, Request, Response, NextFunction } from 'express';
 import createHttpError from 'http-errors';
-import { evaluateDecision } from '../controllers/evaluations';
+
+import { evaluateDecision, saveEvalAndDecisionInDB } from '../controllers/evaluations';
+import { checkForExistingEvals } from '../dal/evaluations';
+import { streamToText } from '../utils/streams';
 
 const router = Router();
 
 // POST /api/evaluations/
+// a special route used for @ai-sdk/react. stream response only via @ai-sdk/openai
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
-    const { decisionNumber, decisionText } = req.body as { decisionNumber: number, decisionText: string };
+    const { decisionNumber, messages } = req.body as { decisionNumber: number, messages: Message[] };
 
-    if (!decisionNumber || !decisionText) {
+    if ((typeof decisionNumber !== 'number') || isNaN(decisionNumber) || !messages?.length) {
         next(createHttpError(400, 'Missing decision number or decision text'));
         return
     }
 
-    const [error, evaluationText] = await evaluateDecision(decisionNumber, decisionText);
-
-    if (error) {
-        next(error);
-    } else {
-        res.send(evaluationText);
+    if (messages[messages.length - 1]?.role !== 'user') {
+        next(createHttpError(400, 'Last message must be from user'));
+        return
     }
+
+    const decisionText = messages[messages.length - 1].content
+    const streamTextResult = evaluateDecision(decisionText);
+
+    try {
+        // Stream the response to the client
+        streamTextResult.pipeDataStreamToResponse(res)
+        
+        const evaluationText = await streamToText(streamTextResult)
+        const [dbError] = await saveEvalAndDecisionInDB(evaluationText, decisionNumber, decisionText)
+        
+        if (dbError) {
+            next(dbError);
+            return
+        }
+        
+        return
+    } catch (error: Error | unknown) {
+        if (!res.headersSent) {
+            console.error('Error streaming response:', error);
+            next(createHttpError(500, `Error streaming response: ${error}`));
+        }
+    }
+});
+
+
+// GET /api/evaluations/:decisionNumber
+router.get('/:decisionNumber', async (req: Request, res: Response, next: NextFunction) => {
+    const decisionNumber = parseInt(req.params.decisionNumber);
+    
+    if (isNaN(decisionNumber)) {
+        next(createHttpError(400, 'Invalid or missing decision number'));
+        return
+    }
+
+    const [existingEvalCheckErr, existingEval] = await checkForExistingEvals(decisionNumber);
+
+    if (existingEvalCheckErr) {
+        next(existingEvalCheckErr);
+        return
+    }
+
+    res.json({ evaluation: existingEval })
 });
 
 export default router;
