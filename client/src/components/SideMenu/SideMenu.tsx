@@ -1,26 +1,34 @@
 import { List, ListItemButton } from '@mui/joy'
 import { HomeOutlined, AutoGraph, InfoOutline } from '@mui/icons-material'
+import { useLocation, useNavigate } from 'react-router'
 
 import './SideMenu.css'
 
-interface SideMenuProps {
-  page: number
-  setPage: (page: number) => void
-}
+function SideMenu() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
-function SideMenu({ page, setPage }: SideMenuProps) {
   return (
     <div className={'side-menu'}>
       <List className={'side-menu-list'}>
-        <ListItemButton selected={page == 0} onClick={() => setPage(0)}>
+        <ListItemButton
+          selected={pathname == '/'}
+          onClick={() => navigate('/')}
+        >
           <HomeOutlined />
           בית
         </ListItemButton>
-        <ListItemButton selected={page == 1} onClick={() => setPage(1)}>
+        <ListItemButton
+          selected={pathname == '/about-us'}
+          onClick={() => navigate('/about-us')}
+        >
           <InfoOutline />
           אודות
         </ListItemButton>
-        <ListItemButton selected={page == 2} onClick={() => setPage(2)}>
+        <ListItemButton
+          selected={pathname == '/methodology'}
+          onClick={() => navigate('/methodology')}
+        >
           <AutoGraph />
           איך אנחנו בודקים
         </ListItemButton>
