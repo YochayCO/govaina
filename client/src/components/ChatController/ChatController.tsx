@@ -1,30 +1,27 @@
-import React, { useState } from "react"
-import { IoReturnUpBackOutline as ReturnIcon } from "react-icons/io5"
-import { DotLoader } from "react-spinners"
-import { IconButton, Textarea } from "@mui/joy"
+import React, { useState } from 'react'
+import { IoReturnUpBackOutline as ReturnIcon } from 'react-icons/io5'
+import { DotLoader } from 'react-spinners'
+import { IconButton, Textarea } from '@mui/joy'
 import { useChat } from '@ai-sdk/react'
-
-import ChatMessage from "../ChatMessage/ChatMessage"
-import UserInput from "../UserInput/UserInput";
-import { checkForExistingEvals } from "../../api/backend/evaluations"
-import { UserAction } from "../../types/users"
+import { useNavigate } from 'react-router'
 
 import './ChatController.css'
+import ChatMessage from '../ChatMessage/ChatMessage'
+import UserInput from '../UserInput/UserInput'
+import { checkForExistingEvals } from '../../api/backend/evaluations'
 
-export interface ChatControllerProps {
-  selectedAction: UserAction | null
-  selectAction: (action: UserAction | null) => void
-}
-
-const INITIAL_MESSAGES = [{
-  id: 'zero-message',
-  role: 'user' as const,
-  content: 'יש לי מספר החלטה',
-}, {
-  id: 'request-decison-number',
-  role: 'assistant' as const,
-  content: 'מעולה, לניתוח החלטה יש להזין את המספר בתיבה',
-}]
+const INITIAL_MESSAGES = [
+  {
+    id: 'zero-message',
+    role: 'user' as const,
+    content: 'יש לי מספר החלטה',
+  },
+  {
+    id: 'request-decison-number',
+    role: 'assistant' as const,
+    content: 'מעולה, לניתוח החלטה יש להזין את המספר בתיבה',
+  },
+]
 const THIRD_MESSAGE = {
   id: 'request-decision-text',
   role: 'assistant' as const,
@@ -33,66 +30,85 @@ const THIRD_MESSAGE = {
 
 const INPUT_PROPS_BY_STATE = {
   requestDecisionNumber: {
-    placeholder: "מה מספר ההחלטה?",
+    placeholder: 'מה מספר ההחלטה?',
     type: 'text',
   },
   requestDecisionText: {
-    placeholder: "הדביקו כאן את תוכן ההחלטה",
+    placeholder: 'הדביקו כאן את תוכן ההחלטה',
     type: 'textarea',
   },
 }
 
-function ChatController({ selectAction }: ChatControllerProps) {
+function ChatController() {
   const [decisionNumber, setDecisionNumber] = useState<number>(0)
-  const { messages, input, setInput, setMessages, handleSubmit, status, stop, error, reload } = useChat({
+  const {
+    messages,
+    input,
+    setInput,
+    setMessages,
+    handleSubmit,
+    status,
+    stop,
+    error,
+    reload,
+  } = useChat({
     api: '/api/evaluations/',
     initialMessages: INITIAL_MESSAGES,
-  });
+  })
+
+  // const { selectedAction } = useOutletContext()
+  const navigate = useNavigate()
 
   const lastMessage = messages[messages.length - 1]
-  const isRequestDecisionNumberState = (
-    lastMessage.role === 'assistant' && 
+  const isRequestDecisionNumberState =
+    lastMessage.role === 'assistant' &&
     lastMessage.id === 'request-decison-number'
-  )
   // TODO: State Machine
-  const isLastMessageFinal = (
-    (messages[messages.length - 1]?.annotations?.[0] as { finalMessage?: boolean })?.finalMessage ||
-    messages.length > 4
-  )
-  const isRequestDecisionTextState = (
+  const isLastMessageFinal =
+    (
+      messages[messages.length - 1]?.annotations?.[0] as {
+        finalMessage?: boolean
+      }
+    )?.finalMessage || messages.length > 4
+  const isRequestDecisionTextState =
     lastMessage.role === 'assistant' &&
     lastMessage.id === 'request-decison-text'
-  )
 
   // TODO: State Machine
   const currInputProps = isRequestDecisionNumberState
     ? INPUT_PROPS_BY_STATE.requestDecisionNumber
-    : isRequestDecisionTextState ? INPUT_PROPS_BY_STATE.requestDecisionText : null
+    : isRequestDecisionTextState
+      ? INPUT_PROPS_BY_STATE.requestDecisionText
+      : null
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setInput(event.target.value)
   }
 
-  const processUserAction: React.FormEventHandler<HTMLFormElement> = async (event) => {
+  const processUserAction: React.FormEventHandler<HTMLFormElement> = async (
+    event,
+  ) => {
     event.preventDefault()
     if (isLastMessageFinal) {
       return
     }
 
     if (isRequestDecisionNumberState) {
-      setMessages((currMessages) => {
-        const newMessages = [...currMessages, {
+      setMessages((currMessages) => [
+        ...currMessages,
+        {
           id: 'decision-number',
           role: 'user' as const,
           content: `מספר החלטה: ${input}`,
-        }]
-        return newMessages
-      })
-      
+        },
+      ])
+
       const newDecisionNumber = parseInt(input)
       setInput('')
       setDecisionNumber(newDecisionNumber)
-      
+
       const [err, evaluation] = await checkForExistingEvals(newDecisionNumber)
 
       if (err) {
@@ -101,17 +117,20 @@ function ChatController({ selectAction }: ChatControllerProps) {
       }
 
       if (evaluation) {
-        setMessages((currMessages) => [...currMessages, {
-          id: 'evaluation',
-          role: 'assistant',
-          content: `מצאתי את ההחלטה שחיפשת, הנה הניתוח שביצעתי עבורה:\n${evaluation}`,
-          annotations: [{ finalMessage: true }],
-        }])
+        setMessages((currMessages) => [
+          ...currMessages,
+          {
+            id: 'evaluation',
+            role: 'assistant',
+            content: `מצאתי את ההחלטה שחיפשת, הנה הניתוח שביצעתי עבורה:\n${evaluation}`,
+            annotations: [{ finalMessage: true }],
+          },
+        ])
       } else {
         setMessages((currMessages) => [...currMessages, THIRD_MESSAGE])
       }
     }
-    
+
     if (messages.length === 4 && !isLastMessageFinal) {
       handleSubmit(event, {
         body: { decisionNumber },
@@ -122,27 +141,29 @@ function ChatController({ selectAction }: ChatControllerProps) {
   }
 
   return (
-    <div className='chat-interface'>
-      <div className='return-to-actions'>
+    <div className="chat-interface">
+      <div className="return-to-actions">
         <IconButton
-          className='return-button'
-          onClick={() => selectAction(null)}
+          className="return-button"
+          onClick={() => navigate('/')}
           variant="soft"
-          title='חזרה למסך הראשי'
+          title="חזרה למסך הראשי"
         >
           <ReturnIcon />
         </IconButton>
       </div>
 
       <div className="messages-section">
-        {messages.map((message) => <ChatMessage key={message.id} message={message} />)}
+        {messages.map((message) => (
+          <ChatMessage key={message.id} message={message} />
+        ))}
       </div>
 
       <form className="inputs-form" onSubmit={processUserAction}>
         {isRequestDecisionTextState && (
           <>
             <Textarea
-              className='decision-text-input'
+              className="decision-text-input"
               value={input}
               onChange={handleInputChange}
               placeholder="הדביקו כאן את תוכן ההחלטה"
@@ -153,9 +174,11 @@ function ChatController({ selectAction }: ChatControllerProps) {
 
         {(status === 'submitted' || status === 'streaming') && (
           <div>
-            {status === 'submitted' && <div className='loader-container'>
-              <DotLoader className="loader" />
-            </div>}
+            {status === 'submitted' && (
+              <div className="loader-container">
+                <DotLoader className="loader" />
+              </div>
+            )}
             <button type="button" onClick={() => stop()}>
               Stop
             </button>
@@ -170,9 +193,9 @@ function ChatController({ selectAction }: ChatControllerProps) {
           </>
         )}
         {!isLastMessageFinal && lastMessage.role === 'assistant' && (
-          <div className='user-input-container'>
+          <div className="user-input-container">
             <UserInput
-              className='user-input'
+              className="user-input"
               value={input}
               onChange={handleInputChange}
               {...currInputProps}
