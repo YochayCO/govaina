@@ -2,18 +2,17 @@ import { catchError } from "../common/errorHandler"
 
 const API_URL = `/api`
 
-export const evaluate = async (decisionNumber: number, decisionText: string): Promise<[Error] | [undefined, string]> => {
-  const [error, response] = await catchError(fetch(`${API_URL}/evaluations`, {
-    method: 'POST',
+export const checkForExistingEvals = async (decisionNumber: number): Promise<[Error] | [undefined, string | null]> => {
+  const [error, response] = await catchError(fetch(`${API_URL}/evaluations/${decisionNumber}`, {
+    method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ decisionNumber, decisionText })
   }));
 
   if (error) {
     return [error]
   }
 
-  const evaluationText = await response.text();
-  
-  return [undefined, evaluationText]
+  const jsonResponse = await response.json() as { evaluation: string | null };
+
+  return [undefined, jsonResponse.evaluation]
 }

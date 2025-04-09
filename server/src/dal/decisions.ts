@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import { getDecisionId } from "../utils/decisions";
 import { supabase } from "./supabaseClient";
 
@@ -13,5 +14,8 @@ export const upsertDecision = async (
         .from("Decisions")
         .upsert({ id: decisionId, num: decisionNumber, text: decisionText });
 
-    return [error ? new Error(error.message) : undefined];
+    if (error) return [createHttpError(500, error.message)]
+
+    console.log(`Decision ${decisionNumber} saved successfully`);
+    return [undefined];
 };

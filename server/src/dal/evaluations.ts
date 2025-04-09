@@ -26,5 +26,8 @@ export const createEval = async (
         eval: evalText,
     });
 
-    return [error ? new Error(error.message) : undefined];
+    if (error) return [createHttpError(500, error.message)]
+
+    console.log(`Evaluation for decision number ${decisionNumber} saved successfully`);
+    return [undefined];
 };

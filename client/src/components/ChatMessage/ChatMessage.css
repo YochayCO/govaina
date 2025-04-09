@@ -1,0 +1,10 @@
+.message {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.message-role {
+    font-weight: 700;
+    margin: 16px 0;
+}
