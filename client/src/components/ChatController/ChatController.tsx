@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { IoReturnUpBackOutline as ReturnIcon } from 'react-icons/io5'
 import { DotLoader } from 'react-spinners'
 import { IconButton, Textarea } from '@mui/joy'
 import { useChat } from '@ai-sdk/react'
 import { useNavigate } from 'react-router'
+import { ArrowBack } from '@mui/icons-material'
 
 import './ChatController.css'
 import ChatMessage from '../ChatMessage/ChatMessage'
@@ -149,7 +149,7 @@ function ChatController() {
           variant="soft"
           title="חזרה למסך הראשי"
         >
-          <ReturnIcon />
+          <ArrowBack />
         </IconButton>
       </div>
 
