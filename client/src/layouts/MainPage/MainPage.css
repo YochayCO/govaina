@@ -1,5 +1,10 @@
 .main-page {
     width: 100%;
+    height: 100%;
+}
+
+.content {
+    height: 100%;
 }
 
 .tutorial {
@@ -9,26 +14,6 @@
     white-space: pre-line;
 }
 
-.inputs-form {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: start;
-    gap: 10px;
-}
-
-.inputs-form label {
-    font-weight: 700;
-}
-
-.decision-text-input {
-    width: 100%;
-}
-
-.evaluate-button {
-    margin-top: 6px;
-}
-
 .logo-section {
     direction: ltr;
     display: flex;
@@ -36,13 +21,4 @@
 
 .logo-section img {
     height: 60px;
-}
-
-.loader-container {
-    display: flex;
-    justify-content: center;
-}
-
-.error-message {
-    overflow-wrap: anywhere;
 }

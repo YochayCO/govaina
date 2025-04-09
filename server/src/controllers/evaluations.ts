@@ -1,47 +1,26 @@
-import createHttpError from 'http-errors';
-import { checkForExistingEvals, createEval } from '../dal/evaluations';
-import { upsertDecision } from '../dal/decisions';
 import { performCompletion } from '../api/openai'
+import { upsertDecision } from '../dal/decisions';
+import { createEval } from '../dal/evaluations';
 import { ASSISTANT_INSTRUCTIONS } from './ASSISTANT_INSTRUCTIONS';
+import { StreamTextResult, ToolSet } from 'ai';
 
-export const evaluateDecision = async (decisionNumber: number, decisionText: string): Promise<[Error] | [undefined, string]> => {
-  const userMessageText = `${decisionText}`;
+export const evaluateDecision = (decisionText: string): StreamTextResult<ToolSet, never> => {
+  const streamTextResult = performCompletion(decisionText, ASSISTANT_INSTRUCTIONS)
 
-  // Check for existing evaluations
-  const [existingEvalCheckErr, existingEval] = await checkForExistingEvals(decisionNumber);
+  return streamTextResult;
+}
 
-  // If there is an unknown error checking for existing evaluations, return it
-  if (existingEvalCheckErr) {
-    if (existingEvalCheckErr.message.includes('More than one existing evaluation')) {
-      console.warn(`Waring: ${existingEvalCheckErr}`);
-    }
-    
-    return [existingEvalCheckErr];
-  }
+export const saveEvalAndDecisionInDB = async (
+  evaluationText: string,
+  decisionNumber: number,
+  decisionText: string,
+): Promise<[Error | undefined]> => {
+  const [decisionUpsertErr] = await upsertDecision(decisionNumber, decisionText)
+  if (decisionUpsertErr) return [decisionUpsertErr]
 
-  // If there is an existing evaluation, return it
-  if (existingEval) {
-    console.log(`Returning existing evaluation for decision number ${decisionNumber}`);
-    return [undefined, existingEval];
-  }
+  const [evalInsertErr] = await createEval(decisionNumber, evaluationText)
+  if (evalInsertErr) return [evalInsertErr]
 
-  // Otherwise, proceed to create a new evaluation
-  const [[completionReqErr, evalText], [decisionInsertErr]] = await Promise.all([
-    performCompletion(userMessageText, ASSISTANT_INSTRUCTIONS),
-    upsertDecision(decisionNumber, decisionText),
-  ])
-
-  if (completionReqErr || decisionInsertErr || !evalText) {
-    return [completionReqErr || decisionInsertErr || createHttpError(500, 'Evaluated empty response')];
-  }
-
-  // Save evaluation in DB
-  const [evalInsertErr] = await createEval(decisionNumber, evalText);
-  
-  if (evalInsertErr) {
-    return [evalInsertErr];
-  }
-  console.log(`Evaluation for decision number ${decisionNumber} saved successfully`);
-
-  return [undefined, evalText];
+  console.log(`Evaluation and decision number ${decisionNumber} saved successfully`)
+  return [undefined]
 }
