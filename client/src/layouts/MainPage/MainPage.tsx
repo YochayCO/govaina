@@ -11,11 +11,11 @@ const TUTORIAL_TEXT_1 = `היי, אני עוזר ה-AI של המרכז להעצ�
 const TUTORIAL_TEXT_2 = ` והדביקו כאן מספר החלטת ממשלה ואת נוסח ההחלטה`
 
 const tutorialElement = (
-  <div className={'tutorial'}>
+  <div className="tutorial">
     {TUTORIAL_TEXT_1}
     <a
-      target={'_blank'}
-      href={'https://www.gov.il/he/departments/dynamiccollectors/gov_decision'}
+      target="_blank"
+      href="https://www.gov.il/he/departments/dynamiccollectors/gov_decision"
     >
       החלטת ממשלה
     </a>
@@ -28,11 +28,11 @@ function MainPage() {
   const { pathname } = useLocation()
 
   return (
-    <div className={'main-page'}>
-      <div className={'logo-section'}>
-        <img src={'/CECI-wide-logo.png'} alt={'CECI logo'} />
+    <div className="main-page">
+      <div className="logo-section">
+        <img src="/CECI-wide-logo.png" alt="CECI logo" />
       </div>
-      <div className={'content'}>
+      <div className="content">
         {pathname == '/' && (
           <>
             {tutorialElement}

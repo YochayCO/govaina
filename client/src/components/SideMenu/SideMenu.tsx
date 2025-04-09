@@ -9,8 +9,8 @@ function SideMenu() {
   const { pathname } = useLocation()
 
   return (
-    <div className={'side-menu'}>
-      <List className={'side-menu-list'}>
+    <div className="side-menu">
+      <List className="side-menu-list">
         <ListItemButton
           selected={pathname == '/'}
           onClick={() => navigate('/')}
@@ -35,11 +35,11 @@ function SideMenu() {
       </List>
 
       <a
-        href={'https://www.ceci.org.il/'}
-        target={'_blank'}
-        rel={'noopener noreferrer'}
+        href="https://www.ceci.org.il/"
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        <img src={'/merkaz-logo-1.png'} alt={'logo'} className={'logo'} />
+        <img src="/merkaz-logo-1.png" alt="logo" className="logo" />
       </a>
     </div>
   )

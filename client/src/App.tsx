@@ -12,11 +12,11 @@ function App() {
     <div className="app">
       <SideMenu />
       <Routes>
-        <Route path={'/'} element={<MainPage />}>
-          <Route path={'chat'} element={<ChatController />} />
+        <Route path="/" element={<MainPage />}>
+          <Route path="chat" element={<ChatController />} />
         </Route>
-        <Route path={'/about-us'} element={<AboutUs />} />
-        <Route path={'/methodology'} element={<Methodology />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/methodology" element={<Methodology />} />
       </Routes>
     </div>
   )
