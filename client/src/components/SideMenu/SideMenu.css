@@ -1,0 +1,28 @@
+.side-menu {
+    background: #e4eff7;
+    width: 350px;
+    padding: 100px 0 0 0;
+}
+
+.side-menu-list {
+    > div {
+        display: flex;
+        align-items: center;
+
+        svg {
+            width: 18px;
+            height: 18px;
+            padding: 2px;
+        }
+
+        &:hover {
+            font-weight: bold;
+            background: inherit !important;
+
+            svg {
+                background: #76a9de;
+                border-radius: 100%;
+            }
+        }
+    }
+}
