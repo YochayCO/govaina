@@ -1,12 +1,13 @@
+import { useNavigate } from 'react-router'
+
+import './ActionsSet.css'
 import ActionButton from './ActionButton'
 import { UserAction } from '../../types/users'
 
-import './ActionsSet.css'
-
-export type ActionsSetProps = { 
-    actions: UserAction[]; 
-    selectedAction: UserAction | null;
-    selectAction: (action: UserAction | null) => void;
+export type ActionsSetProps = {
+  actions: UserAction[]
+  selectedAction: UserAction | null
+  selectAction: (action: UserAction | null) => void
 }
 
 const ACTION_LABELS_DICT: Record<UserAction, string> = {
@@ -19,21 +20,30 @@ const ACTION_LABELS_DICT: Record<UserAction, string> = {
 
 const DISABLED_ACTIONS: UserAction[] = [
   'showExampleByLink',
-  'chatAboutDecision'
+  'chatAboutDecision',
 ]
 
-function ActionsSet({ actions, selectedAction, selectAction }: ActionsSetProps) {
+function ActionsSet({
+  actions,
+  selectedAction,
+  selectAction,
+}: ActionsSetProps) {
+  const navigate = useNavigate()
+
   return (
-    <div className='actions-set'>
+    <div className="actions-set">
       {actions.map((action) => (
-          <ActionButton
-            key={action}
-            active={action === selectedAction}
-            onClick={() => selectAction(action)}
-            disabled={DISABLED_ACTIONS.includes(action)}
-          >
+        <ActionButton
+          key={action}
+          active={action === selectedAction}
+          onClick={() => {
+            selectAction(action)
+            navigate('chat')
+          }}
+          disabled={DISABLED_ACTIONS.includes(action)}
+        >
           {ACTION_LABELS_DICT[action]}
-          </ActionButton>
+        </ActionButton>
       ))}
     </div>
   )

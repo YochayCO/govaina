@@ -1,0 +1,37 @@
+.side-menu {
+    background: #e4eff7;
+    width: 350px;
+    padding: 120px 0 30px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.side-menu-list {
+    width: 100%;
+
+    > div {
+        display: flex;
+        align-items: center;
+
+        svg {
+            width: 18px;
+            height: 18px;
+            padding: 2px;
+        }
+
+        &:hover {
+            font-weight: bold;
+
+            svg {
+                background: #76a9de;
+                border-radius: 100%;
+            }
+        }
+    }
+}
+
+.logo {
+    width: 150px;
+}

@@ -4,10 +4,6 @@
     overflow: hidden;
 }
 
-.content {
-    height: 100%;
-}
-
 .tutorial {
     max-width: 80%;
     margin: 30px auto;
