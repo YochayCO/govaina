@@ -1,5 +1,7 @@
 import { List, ListItemButton } from '@mui/joy'
-import { HomeOutlined, AutoGraph, InfoOutline } from '@mui/icons-material'
+import HomeOutlined from '@mui/icons-material/HomeOutlined'
+import AutoGraph from '@mui/icons-material/AutoGraph'
+import InfoOutline from '@mui/icons-material/InfoOutline'
 import { useLocation, useNavigate } from 'react-router'
 
 import './SideMenu.css'
