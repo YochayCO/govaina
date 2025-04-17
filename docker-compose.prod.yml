@@ -1,0 +1,24 @@
+services:
+  client:
+    image: ${CLIENT_IMAGE}:${CLIENT_TAG}
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+
+  server:
+    image: ${SERVER_IMAGE}:${SERVER_TAG}
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env.production
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
