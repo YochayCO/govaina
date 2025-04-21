@@ -1,5 +1,7 @@
-import createHttpError from 'http-errors'
-import { supabase } from './supabaseClient'
+import createHttpError from "http-errors";
+import { supabase } from "./supabaseClient";
+// import { getDecisionId } from "../utils/decisions";
+// import { upsertDecision } from "./decisions";
 
 export const checkForExistingEvals = async (
   decisionNumber: string,
@@ -35,5 +37,21 @@ export const createEval = async (
   console.log(
     `Evaluation for decision number ${decisionNumber}|${decisionDate} saved successfully`,
   )
-  return [undefined]
-}
+  return [undefined];
+};
+
+// TODO: adapt to new schema with decision_date
+// export const saveEvalAndDecisionInDB = async (
+//   evaluationText: string,
+//   decisionNumber: number,
+//   decisionText: string
+// ): Promise<[Error | undefined]> => {
+//   const [decisionUpsertErr] = await upsertDecision(decisionNumber, decisionText);
+//   if (decisionUpsertErr) return [decisionUpsertErr];
+
+//   const [evalInsertErr] = await createEval(decisionNumber, evaluationText);
+//   if (evalInsertErr) return [evalInsertErr];
+
+//   console.log(`Evaluation and decision number ${decisionNumber} saved successfully`);
+//   return [undefined];
+// };

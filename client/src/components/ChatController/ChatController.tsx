@@ -1,147 +1,89 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DotLoader } from 'react-spinners'
-import { IconButton, Textarea } from '@mui/joy'
-import { useChat } from '@ai-sdk/react'
+import { IconButton } from '@mui/joy'
+import { Message } from '@ai-sdk/react'
 import { useNavigate } from 'react-router'
 import { ArrowBack } from '@mui/icons-material'
-
-import './ChatController.css'
+import { sendNewMessage } from '../../api/chat'
 import ChatMessage from '../ChatMessage/ChatMessage'
 import UserInput from '../UserInput/UserInput'
-import { checkForExistingEvals } from '../../api/backend/evaluations'
+import { ChatEvent, ChatEventType } from '../../types/streams'
 
-const INITIAL_MESSAGES = [
-  {
-    id: 'zero-message',
-    role: 'user' as const,
-    content: 'יש לי מספר החלטה',
-  },
-  {
-    id: 'request-decison-number',
-    role: 'assistant' as const,
-    content: 'מעולה, לניתוח החלטה יש להזין את המספר בתיבה',
-  },
-]
-const THIRD_MESSAGE = {
-  id: 'request-decision-text',
-  role: 'assistant' as const,
-  content: 'הזן את תוכן ההחלטה',
-}
+import './ChatController.css'
 
-const INPUT_PROPS_BY_STATE = {
-  requestDecisionNumber: {
-    placeholder: 'מה מספר ההחלטה?',
-    type: 'text',
-  },
-  requestDecisionText: {
-    placeholder: 'הדביקו כאן את תוכן ההחלטה',
-    type: 'textarea',
-  },
-}
+const INITIAL_MESSAGE_TEXT = 'יש לי מספר החלטה'
 
 function ChatController() {
-  const [decisionNumber, setDecisionNumber] = useState<number>(0)
-  const {
-    messages,
-    input,
-    setInput,
-    setMessages,
-    handleSubmit,
-    status,
-    stop,
-    error,
-    reload,
-  } = useChat({
-    api: '/api/evaluations/',
-    initialMessages: INITIAL_MESSAGES,
-  })
-
-  // const { selectedAction } = useOutletContext()
+  const requestInProgress = useRef(false)
+  const conversationId = useRef<string>(undefined);
+  const [userInputValue, setUserInputValue] = useState(INITIAL_MESSAGE_TEXT);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate()
 
-  const lastMessage = messages[messages.length - 1]
-  const isRequestDecisionNumberState =
-    lastMessage.role === 'assistant' &&
-    lastMessage.id === 'request-decison-number'
-  // TODO: State Machine
-  const isLastMessageFinal =
-    (
-      messages[messages.length - 1]?.annotations?.[0] as {
-        finalMessage?: boolean
-      }
-    )?.finalMessage || messages.length > 4
-  const isRequestDecisionTextState =
-    lastMessage.role === 'assistant' &&
-    lastMessage.id === 'request-decison-text'
+  const updateLastMessage = (updateContentFn: (currentContent: string) => string) => {
+    setMessages((messages) => {
+      const newMessages = [...messages];
+      const lastMessage = newMessages[newMessages.length - 1];
 
-  // TODO: State Machine
-  const currInputProps = isRequestDecisionNumberState
-    ? INPUT_PROPS_BY_STATE.requestDecisionNumber
-    : isRequestDecisionTextState
-      ? INPUT_PROPS_BY_STATE.requestDecisionText
-      : null
+      if (!lastMessage) {
+        console.error('No last message to update')
+        return newMessages;
+      }
+      
+      newMessages[newMessages.length - 1] = { 
+        ...lastMessage, 
+        content: updateContentFn(lastMessage.content) 
+      };
+      return newMessages;
+    });
+  };
+
+  const setLastMessageContent = (newContent: string) => {
+    updateLastMessage(() => newContent);
+  };
+
+  const appendDeltaToLastMessage = (delta: string) => {
+    updateLastMessage((currentContent) => currentContent + delta);
+  };
+
+  const sendNewInput = async (e?: React.FormEvent<Element>) => {
+    e?.preventDefault();
+    const newMessageContent = userInputValue.trim();
+
+    // If answer is streaming or user input is empty, don't send a new message
+    if (requestInProgress.current || newMessageContent === '') return
+    requestInProgress.current = true
+    
+    setMessages((messages) => [...messages, {
+      id: `fake-message-id-${messages.length}`,
+      role: 'user',
+      content: userInputValue,
+    }])
+    setUserInputValue('')
+
+    try {
+      const chatEventStream = await sendNewMessage(newMessageContent, conversationId.current);
+
+      for await (const chatEvent of chatEventStream) {
+        processChatEvent(chatEvent);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setError('Error sending message');
+      requestInProgress.current = false;
+    }
+  }
+
+  useEffect(() => {
+    sendNewInput()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setInput(event.target.value)
-  }
-
-  const processUserAction: React.FormEventHandler<HTMLFormElement> = async (
-    event,
-  ) => {
-    event.preventDefault()
-    if (isLastMessageFinal) {
-      return
-    }
-
-    if (isRequestDecisionNumberState) {
-      setMessages((currMessages) => [
-        ...currMessages,
-        {
-          id: 'decision-number',
-          role: 'user' as const,
-          content: `מספר החלטה: ${input}`,
-        },
-      ])
-
-      // TODO input should include the date and allow for a string
-      const newDecisionNumber = parseInt(input)
-      setInput('')
-      setDecisionNumber(newDecisionNumber)
-
-      const [err, evaluation] = await checkForExistingEvals(
-        newDecisionNumber.toString(),
-        '2025-01-01',
-      )
-
-      if (err) {
-        console.error(err)
-        return
-      }
-
-      if (evaluation) {
-        setMessages((currMessages) => [
-          ...currMessages,
-          {
-            id: 'evaluation',
-            role: 'assistant',
-            content: `מצאתי את ההחלטה שחיפשת, הנה הניתוח שביצעתי עבורה:\n${evaluation}`,
-            annotations: [{ finalMessage: true }],
-          },
-        ])
-      } else {
-        setMessages((currMessages) => [...currMessages, THIRD_MESSAGE])
-      }
-    }
-
-    if (messages.length === 4 && !isLastMessageFinal) {
-      handleSubmit(event, {
-        body: { decisionNumber },
-      })
-
-      return
-    }
+    setUserInputValue(event.target.value)
   }
 
   return (
@@ -163,52 +105,58 @@ function ChatController() {
         ))}
       </div>
 
-      <form className="inputs-form" onSubmit={processUserAction}>
-        {isRequestDecisionTextState && (
-          <>
-            <Textarea
-              className="decision-text-input"
-              value={input}
-              onChange={handleInputChange}
-              placeholder="הדביקו כאן את תוכן ההחלטה"
-              minRows={4}
-            />
-          </>
-        )}
-
-        {(status === 'submitted' || status === 'streaming') && (
+      <form className="inputs-form" onSubmit={sendNewInput}>
+        {requestInProgress.current && (
           <div>
-            {status === 'submitted' && (
+            {messages[messages.length - 1]?.content === '' && (
               <div className="loader-container">
                 <DotLoader className="loader" />
               </div>
             )}
-            <button type="button" onClick={() => stop()}>
+            {/* <button type="button" disabled>
               Stop
-            </button>
+            </button> */}
           </div>
         )}
         {error && (
           <>
             <div>An error occurred.</div>
-            <button type="button" onClick={() => reload()}>
+            {/* <button type="button" onClick={() => reload()}>
               Retry
-            </button>
+            </button> */}
           </>
         )}
-        {!isLastMessageFinal && lastMessage.role === 'assistant' && (
-          <div className="user-input-container">
-            <UserInput
-              className="user-input"
-              value={input}
-              onChange={handleInputChange}
-              {...currInputProps}
-            />
-          </div>
-        )}
+        <div className="user-input-container">
+          <UserInput
+            className="user-input"
+            value={userInputValue}
+            type="textarea"
+            onChange={handleInputChange}
+          />
+        </div>
       </form>
     </div>
   )
+
+  function processChatEvent(chatEvent: ChatEvent) {
+    switch (chatEvent.type) {
+      case ChatEventType.MessageCreated:
+        conversationId.current = chatEvent.conversationId // set conversation ID
+        break
+      case ChatEventType.MessageAdded:
+        setMessages((messages) => [...messages, chatEvent.message])
+        break
+      case ChatEventType.MessageDelta:
+        appendDeltaToLastMessage(chatEvent.delta) // update state with new chunk
+        break
+      case ChatEventType.MessageCompleted:
+        setLastMessageContent(chatEvent.text) // update state with final message
+        requestInProgress.current = false;
+        break
+      default:
+        break
+    }
+  }
 }
 
 export default ChatController
