@@ -113,17 +113,11 @@ function ChatController() {
                 <DotLoader className="loader" />
               </div>
             )}
-            {/* <button type="button" disabled>
-              Stop
-            </button> */}
           </div>
         )}
         {error && (
           <>
             <div>An error occurred.</div>
-            {/* <button type="button" onClick={() => reload()}>
-              Retry
-            </button> */}
           </>
         )}
         <div className="user-input-container">

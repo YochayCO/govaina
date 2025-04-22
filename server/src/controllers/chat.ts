@@ -17,13 +17,10 @@ export const chatController = async (req: Request, res: Response, next: NextFunc
 
             switch (responsePart.type) {
                 case OpenAIEventType.ResponseCreated:
-                    // Has a lot of data
-                // case 'response.in_progress':
                     chatEvent = { type: ChatEventType.MessageCreated, conversationId: responsePart.response.id }
                     res.write(JSON.stringify(chatEvent) + '\n')
                     break;
                 case OpenAIEventType.ResponseOutputItemAdded:
-                // case 'response.content_part.added':
                     resOutputMessage = (responsePart.item as ResponseOutputMessage)
                     chatEvent = { 
                         type: ChatEventType.MessageAdded, 
@@ -40,8 +37,6 @@ export const chatController = async (req: Request, res: Response, next: NextFunc
                     res.write(JSON.stringify(chatEvent) + '\n')
                     break;
                 case OpenAIEventType.ResponseOutputTextDone:
-                // case 'response.output_item.done':
-                // case 'response.content_part.done':
                     chatEvent = { type: ChatEventType.MessageCompleted, text: responsePart.text }
                     res.write(JSON.stringify(chatEvent) + '\n')
                     break;
