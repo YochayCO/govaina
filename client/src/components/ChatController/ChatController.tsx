@@ -105,11 +105,15 @@ function ChatController() {
         },
       ])
 
+      // TODO input should include the date and allow for a string
       const newDecisionNumber = parseInt(input)
       setInput('')
       setDecisionNumber(newDecisionNumber)
 
-      const [err, evaluation] = await checkForExistingEvals(newDecisionNumber)
+      const [err, evaluation] = await checkForExistingEvals(
+        newDecisionNumber.toString(),
+        '2025-01-01',
+      )
 
       if (err) {
         console.error(err)
