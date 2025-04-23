@@ -126,6 +126,8 @@ function ChatController() {
             value={userInputValue}
             type="textarea"
             onChange={handleInputChange}
+            onSubmit={sendNewInput}
+            disabled={requestInProgress.current}
           />
         </div>
       </form>

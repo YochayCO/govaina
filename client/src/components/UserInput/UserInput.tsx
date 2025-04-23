@@ -9,8 +9,9 @@ export interface UserInputProps {
   placeholder?: string
   type?: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (event?: React.FormEvent<HTMLFormElement>) => void
   value: string
+  disabled?: boolean
 }
 
 const UserInput = ({
@@ -18,9 +19,20 @@ const UserInput = ({
   placeholder,
   type,
   onChange,
+  onSubmit,
   value,
+  disabled,
 }: UserInputProps) => {
   const numOfLines = value.split('\n').length <= 4 ? value.split('\n').length : 5
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      
+      if (onSubmit) {
+        onSubmit()
+      }
+    }
+  }
 
   return (
     <div className={cx('input-container', className)}>
@@ -30,7 +42,9 @@ const UserInput = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          onKeyDown={handleKeyDown}
           rows={numOfLines}
+          disabled={disabled}
         />
       ) : (
         <input
@@ -38,6 +52,8 @@ const UserInput = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
         />
       )}
       <IconButton className="input-button" variant="outlined" type="submit">
