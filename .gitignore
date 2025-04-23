@@ -28,5 +28,6 @@ dist-ssr
 
 # But don't ignore .env.example
 !.env.example
+!.env.prod.example
 
 .vercel
