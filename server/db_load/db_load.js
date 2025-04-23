@@ -17,13 +17,13 @@ async function loadExcelToSupabase(filePath, tableName) {
 
     data = data.map((item) => ({
       num: item['Decision Number'],
-      date: item['Decision Date'].split('/').reverse().join('-'),
-      pathname: item['Decision URL'].split('/').slice(-1)[0],
+      date: item['Decision Date'].split('/').reverse().join('-'), // YYYY-MM-DD
+      pathname: item['Decision URL'].split('/').slice(-1)[0], // get the last part of the URL
       title: item['Decision Title'],
       content: item['Decision Content'],
       summary: item['Summary'],
-      gov_num: parseInt(item['Government Number'].replace(/\D/g, '')),
-      prime_minister: item['Government Number'].split(', ')?.[1],
+      gov_num: parseInt(item['Government Number'].replace(/\D/g, '')), // remove non-digit characters
+      prime_minister: item['Government Number'].split(', ')?.[1], // get the second part of the string
       committee: item['Committee'],
       operativity: item['Operativity'] === 'אופרטיבית',
       field: item['Field'],
