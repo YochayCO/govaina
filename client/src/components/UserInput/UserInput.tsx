@@ -8,7 +8,7 @@ export interface UserInputProps {
   className?: string
   placeholder?: string
   type?: string
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   value: string
 }
@@ -22,9 +22,9 @@ const UserInput = ({
 }: UserInputProps) => {
   return (
     <div className={cx('input-container', className)}>
-      <input
+      <textarea
         className="input-field"
-        type={type}
+        rows={type == 'text' ? 1 : 2}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
