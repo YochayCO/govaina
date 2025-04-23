@@ -1,21 +1,19 @@
-import createHttpError from "http-errors";
-import { getDecisionId } from "../utils/decisions";
-import { supabase } from "./supabaseClient";
+import createHttpError from 'http-errors'
+import { supabase } from './supabaseClient'
 
 export const upsertDecision = async (
-    decisionNumber: number,
-    decisionText: string
+  decisionNumber: string,
+  decisionDate: string,
+  decisionText: string,
 ): Promise<[Error | undefined]> => {
-    const decisionId = getDecisionId(decisionNumber);
+  console.log(`Upserting decision with ID: ${decisionNumber}|${decisionDate}`)
 
-    console.log(`Upserting decision with ID: ${decisionId}`);
+  const { error } = await supabase
+    .from('Decisions')
+    .upsert({ num: decisionNumber, date: decisionDate, text: decisionText })
 
-    const { error } = await supabase
-        .from("Decisions")
-        .upsert({ id: decisionId, num: decisionNumber, text: decisionText });
+  if (error) return [createHttpError(500, error.message)]
 
-    if (error) return [createHttpError(500, error.message)]
-
-    console.log(`Decision ${decisionNumber} saved successfully`);
-    return [undefined];
-};
+  console.log(`Decision ${decisionNumber}|${decisionDate} saved successfully`)
+  return [undefined]
+}
