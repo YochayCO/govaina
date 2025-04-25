@@ -1,13 +1,14 @@
-import { Message } from 'ai'
+// TODO: remove this file and use the code from the chat controller
+
 import { Router, Request, Response, NextFunction } from 'express'
 import createHttpError from 'http-errors'
 
-import {
-  evaluateDecision,
-  saveEvalAndDecisionInDB,
-} from '../controllers/evaluations'
+// import {
+//   // evaluateDecision,
+//   saveEvalAndDecisionInDB,
+// } from '../controllers/evaluations'
 import { checkForExistingEvals } from '../dal/evaluations'
-import { streamToText } from '../utils/streams'
+import { Message } from 'openai/resources/beta/threads/messages'
 
 const router = Router()
 
@@ -35,25 +36,25 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     return
   }
 
-  const decisionText = messages[messages.length - 1].content
-  const streamTextResult = evaluateDecision(decisionText)
+  // const decisionText = messages[messages.length - 1].content
+  // const streamTextResult = evaluateDecision(decisionText)
 
   try {
     // Stream the response to the client
-    streamTextResult.pipeDataStreamToResponse(res)
+    // streamTextResult.pipeDataStreamToResponse(res)
 
-    const evaluationText = await streamToText(streamTextResult)
-    const [dbError] = await saveEvalAndDecisionInDB(
-      evaluationText,
-      decisionNumber,
-      decisionDate,
-      decisionText,
-    )
+    // const evaluationText = await streamToText(streamTextResult)
+    // const [dbError] = await saveEvalAndDecisionInDB(
+    //   evaluationText,
+    //   decisionNumber,
+    //   decisionDate,
+    //   decisionText,
+    // )
 
-    if (dbError) {
-      next(dbError)
-      return
-    }
+    // if (dbError) {
+    //   next(dbError)
+    //   return
+    // }
 
     return
   } catch (error: Error | unknown) {

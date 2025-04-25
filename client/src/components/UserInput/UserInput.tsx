@@ -8,9 +8,10 @@ export interface UserInputProps {
   className?: string
   placeholder?: string
   type?: string
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onSubmit?: (event?: React.FormEvent<HTMLFormElement>) => void
   value: string
+  disabled?: boolean
 }
 
 const UserInput = ({
@@ -18,17 +19,43 @@ const UserInput = ({
   placeholder,
   type,
   onChange,
+  onSubmit,
   value,
+  disabled,
 }: UserInputProps) => {
+  const numOfLines = value.split('\n').length <= 4 ? value.split('\n').length : 5
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      
+      if (onSubmit) {
+        onSubmit()
+      }
+    }
+  }
+
   return (
     <div className={cx('input-container', className)}>
-      <textarea
-        className="input-field"
-        rows={type == 'text' ? 1 : 2}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-      />
+      {type === 'textarea' ? (
+        <textarea
+          className="input-field"
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onKeyDown={handleKeyDown}
+          rows={numOfLines}
+          disabled={disabled}
+        />
+      ) : (
+        <input
+          className="input-field"
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+        />
+      )}
       <IconButton className="input-button" variant="outlined" type="submit">
         <Send sx={{ transform: 'rotate(180deg)' }} />
       </IconButton>

@@ -9,14 +9,21 @@
 
 .input-field {
     width: 100%;
-    /* Add right padding for the button */
     border: 1px solid #526985;
     border-radius: 40px;
-    font-size: 28px;
+    font-size: 18px;
     background-color: #fff;
     box-shadow: 0px 3px 6px #00000029;
     padding: 20px;
     color: #000;
+    resize: none;
+}
+.input-field::-webkit-scrollbar {
+    width: 20px;
+}
+
+.input-field::-webkit-scrollbar-track {
+    background-color: transparent;
 }
 
 .MuiIconButton-root.input-button {
@@ -31,4 +38,4 @@
 .MuiIconButton-root.input-button:hover {
     background-color: #002856;
     color: #fff;
-}   
+}
