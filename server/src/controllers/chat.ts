@@ -6,7 +6,6 @@ import { Request, Response, NextFunction } from 'express'
 import { callFunction, getAssistantResponse } from '../api/openai'
 import { ChatEvent, ChatEventType, OpenAIEventType } from '../types/streams'
 import { Stream } from 'openai/streaming'
-import { ToolName } from '../llms/tools'
 
 export const chatController = async (
   req: Request,
@@ -52,7 +51,6 @@ async function processLlmResponse(
     return new Promise(async (resolve) => {
       let chatEvent: ChatEvent
       let message: ResponseOutputMessage
-      let toolName: ToolName
       let evaluation: string | undefined
       let error: Error | undefined
       let toolCall: ResponseFunctionToolCall
@@ -72,7 +70,6 @@ async function processLlmResponse(
           break
         case OpenAIEventType.ResponseOutputItemAdded:
           if (responsePart.item.type === 'function_call') {
-            toolName = responsePart.item.name as ToolName
             toolCall = responsePart.item as ResponseFunctionToolCall
             chatEvent = {
               type: ChatEventType.MessageAdded,
