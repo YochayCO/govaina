@@ -1,0 +1,70 @@
+name: decisions_data
+source:
+  type: postgres
+  # connection:
+    # host:
+    # port:
+    # database:
+    # user:
+    # password: 
+  table: decisions
+description: Government decisions dataset from postgres database
+columns:
+  - name: num
+    type: string
+    description: Unique decision identifier string within a specific government
+  - name: date
+    type: datetime
+    description: Date of publication of the decision (YYYY-MM-DD)
+  - name: pathname
+    type: string
+    description: Url path to the full decision details
+  - name: title
+    type: string
+    description: Title of the decision
+  - name: content
+    type: string
+    description: Full content of the decision
+  - name: summary
+    type: string
+    description: Summary of the decision content
+  - name: gov_num
+    type: integer
+    description: Government serial number (25, ..., 37)
+  - name: prime_minister
+    type: string
+    description: Name of the Prime Minister in office at the time of the decision
+  - name: committee
+    type: string
+    description: Name of the committee that published the decision
+  - name: operativity
+    type: boolean
+    description: Indicates if the decision is operative or declerative (TRUE = operative, FALSE = declerative)
+  - name: field
+    type: string
+    description: >
+      Comma-seperated list of fields related to the decision
+      (אזרחים ותיקים, אנרגיה מים ותשתיות, ביטחון פנים, בריאות, דיור ונדלן, הגנת הסביבה,
+      הון פיננסים וביטוח, חוץ הסברה ותפוצות, חינוך, חקיקה ומשפט, חקלאות ופיתוח הכפר,
+      יוקר מחיה, מדיני בטחוני, מדע וטכנולוגיה, מיעוטים, ממשל ומנהל ציבורי, משפטים,
+      ספורט, עבודה, פיתוח הנגב והגליל, שלטון מקומי, קליטת עלייה, רגולציה,
+      רווחה ושירותים חברתיים, שירות ציבורי, שירותי דת, תחבורה ובטיחות בדרכים,
+      תיירות, תקשורת, תעסוקה, תעשייה מסחר ומשק, פיננסים ומיסוי, תרבות)
+  - name: offices
+    type: string
+    description: >
+      Comma-seperated list of offices related to the decision
+      (משרד לביטחון לאומי, משרד המשפטים, משרד הבריאות, משרד החינוך, משרד הפנים,
+      משרד התחבורה, משרד הכלכלה, משרד התקשורת, משרד האוצר, משרד החקלאות, משרד התיירות,
+      משרד העבודה, משרד להגנת הסביבה, משרד הבינוי, משרד החוץ, משרד לשוויון חברתי,
+      משרד האנרגיה, משרד לשירותי דת, משרד לשיתוף פעולה אזורי, משרד המדע, מערך הדיגיטל,
+      משרד החדשנות, משרד הכלכלה, משרד המורשת, משרד התרבות, משרד העלייה, משרד הרווחה,
+      משרד ירושלים, משרד ראש הממשלה, משרד הנגב, משרד ההתיישבות, משרד הביטחון,
+      משרד המודיעין, משרד התפוצות, משרד לעניינים אסטרטגיים, משרד ההסברה,
+      משרד לביטחון פנים, משרד המשטרה, אגף תקציבים, החשב הכללי, רשות מקרקעי ישראל,
+      מועצת מקרקעי ישראל, רשות הרגולציה, מערך הסייבר הלאומי, נציבות שירות המדינה,
+      לשכה מרכזית לסטטיסטיקה, יחידה ממשלתית לחופש המידע, מועצה להשכלה גבוהה,
+      רשות המיסים, רשות החדשנות, זרוע העבודה, רשות הספנות, רשות להתחדשות עירונית,
+      נתיבי ישראל, רשות לקידום מעמד האישה, מנהל התכנון, רשות המים, אגף שיקום,
+      מטה התכנון הלאומי, ביטוח לאומי, רשות האוכלוסין, רשות האכיפה והגבייה,
+      משטרה, שירותי התעסוקה)

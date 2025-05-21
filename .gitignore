@@ -31,3 +31,6 @@ dist-ssr
 !.env.prod.example
 
 .vercel
+
+.venv
+__pycache__/
