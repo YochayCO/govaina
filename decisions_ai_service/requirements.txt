@@ -1,0 +1,6 @@
+fastapi
+pandasai
+pandasai-openai
+uvicorn
+dotenv
+pandasai-sql[postgres]
