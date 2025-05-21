@@ -15,6 +15,10 @@ This project provides an AI-powered decision-fetching service.
     pip install -r requirements.txt
     ```
 
+3. **Setup .env.local**
+    
+    +Insert db env vars to connection section in `schema.yaml`
+
 ## Running the Service
 
 Start the service using `uvicorn`:
